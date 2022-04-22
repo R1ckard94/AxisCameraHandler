@@ -26,9 +26,7 @@ def isValid(jsonMsg):
 
     if(jsonMsg["class"] == 'Vehicle'):
         print("diz is Vehicle")
-        tmp = jsonMsg["path"]
-        for tm in tmp:
-            print(tm["x"])
+        
 
 
 def on_connect(client, userdata, flags, rc):
