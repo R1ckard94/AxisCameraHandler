@@ -21,7 +21,7 @@ def isValid(jsonMsg):
         tmpArr = []
         for tm in tmp:
             tmpArr.append(tm["x"])
-        #print(tmpArr)
+            
         if(tmpArr[0] < tmpArr[-1]): #går från vänster till höger 
             if(tmpArr[-1] > 250): #måste nog ändra så att storleken blir mindre eller större beroende på data som kommer in
                 print("person in")
@@ -43,8 +43,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("#")
 
 def on_message(client, userdata, msg):
-    #print(msg.topic+" :: "+str(msg.payload)) #får konstigt " b'payload' "
-    #print("thread activitiy")
+    #print(msg.topic+" :: "+str(msg.payload)) 
     isValid(json.loads(msg.payload))
     time.sleep(4)
 
