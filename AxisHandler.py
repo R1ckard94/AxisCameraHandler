@@ -1,15 +1,22 @@
 from multiprocessing.connection import Client
+from datetime import date, datetime
 import paho.mqtt.client as mqtt
-import  json, time
+import  json, time, requests
 
+url = 'https://peoplecounterapi.azurewebsites.net/api/Counted'
 
-def sendToApi(jsonMsg): #det som sållas fram av "isValid"
-    print()
+def sendToApi(payload): #det som sållas fram av "isValid"
+    dt = datetime.now()
+    jsonStr = {
+        "date_and_time": str(dt),
+        "personIn": payload
+    }
+    postResult = requests.post(url, json = jsonStr) #omvanldar string till json 
+    print(postResult)
 
 def isValid(jsonMsg):
     #behöver ingen kö för att även om mitt program är segt så kommer brokern skicka ut det som kommer fram till den ändå
     if(jsonMsg["class"] == 'Person'):
-        #print("diz is person")
         tmp = jsonMsg["path"]
         tmpArr = []
         for tm in tmp:
@@ -17,21 +24,22 @@ def isValid(jsonMsg):
         #print(tmpArr)
         if(tmpArr[0] < tmpArr[-1]): #går från vänster till höger 
             if(tmpArr[-1] > 250): #måste nog ändra så att storleken blir mindre eller större beroende på data som kommer in
-                 print("en person har gått ut!")
-                 return
-        if(tmpArr[0] > tmpArr[-1]):
-            if(tmpArr[0] < 250):
-                print("en person har gått in!")
+                print("person in")
+                sendToApi(True)
+                return
+        if(tmpArr[0] > tmpArr[-1]): #går från höger till vänster
+            if(tmpArr[-1] < 250):
+                print("person ut")
+                sendToApi(False)
                 return
 
-    if(jsonMsg["class"] == 'Vehicle'):
-        print("diz is Vehicle")
+    #if(jsonMsg["class"] == 'Vehicle'): test case för att se om vehicle funkar, men behövs inte
+        #print("diz is Vehicle")
         
 
 
 def on_connect(client, userdata, flags, rc):
-    if(rc != 0):
-        print("Connection code "+str(rc))
+    print("Connection code "+str(rc))
     client.subscribe("#")
 
 def on_message(client, userdata, msg):
