@@ -15,35 +15,29 @@ def sendToApi(payload): #det som sållas fram av "isValid"
     print(postResult)
 
 def isValid(jsonMsg):
-    #behöver ingen kö för att även om mitt program är segt så kommer brokern skicka ut det som kommer fram till den ändå
-    
+    #programmets data hanterar allt i en kö så att programmet inte blir överflödigt
     tmp = jsonMsg["path"]
     tmpArr = []
     for tm in tmp:
         tmpArr.append(tm["x"])
-    #print("person walking") 
-    #print(tmpArr)
+
     if(tmpArr[0] < tmpArr[-1]): #går från vänster till höger 
-        if tmpArr[-1] > 450 and tmpArr[0] < 450: #måste nog ändra så att storleken blir mindre eller större beroende på data som kommer in
+        if tmpArr[-1] > 450 and tmpArr[0] < 450:  
             print("person in")
-            #sendToApi(True)
+            sendToApi(True)
     elif(tmpArr[0] > tmpArr[-1]): #går från höger till vänster
         if tmpArr[0] > 450 and tmpArr[-1] < 450:
             print("person ut")
-            #sendToApi(False)
+            sendToApi(False)
 
         
-
-
 def on_connect(client, userdata, flags, rc):
     print("Connection code "+str(rc))
     client.subscribe("#")
 
 def on_message(client, userdata, msg):
-    #print(msg.topic+" :: "+str(msg.payload)) 
     if(str(msg.topic) == "xmotion/path/B8A44F0AFAC4"): 
         isValid(json.loads(msg.payload))
-    #time.sleep(4)
 
 
 client = mqtt.Client()
